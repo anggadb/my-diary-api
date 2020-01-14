@@ -1,8 +1,10 @@
-package config
+package database
 
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"os"
+	"strconv"
 )
 
 var db *gorm.DB
@@ -16,12 +18,17 @@ type DBConfig struct {
 }
 
 func BuildDBConfig() *DBConfig {
+	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
 	dbConfig := DBConfig{
-		Host:     "localhost",
-		Port:     5432,
-		User:     "postgres",
-		Name:     "my_diary",
-		Password: "Password",
+		Host:     os.Getenv("DB_HOST"),
+		Port:     port,
+		User:     os.Getenv("DB_USER"),
+		Name:     os.Getenv("DB_NAME"),
+		Password: os.Getenv("DB_PASSWORD"),
 	}
 	return &dbConfig
 }
