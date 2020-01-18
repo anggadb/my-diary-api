@@ -6,16 +6,12 @@ import (
 	"net/http"
 )
 
-type JSON struct {
-	message string
-}
-
 func CreateUser(c *gin.Context) {
 	var user models.User
-	c.BindJSON(&user)
+	c.ShouldBind(&user)
 	err := models.CreateUser(&user)
 	if err != nil {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatusJSON(http.StatusConflict, err)
 	} else {
 		c.JSON(http.StatusCreated, user)
 	}
@@ -23,19 +19,15 @@ func CreateUser(c *gin.Context) {
 }
 func GetAllUsers(c *gin.Context) {
 	var u []models.User
-	err := models.FindAllUsers(&u)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNoContent)
-	} else {
-		c.JSON(http.StatusOK, u)
-	}
+	models.FindAllUsers(&u)
+	c.JSON(http.StatusOK, u)
 }
 func GetUser(c *gin.Context) {
 	var user models.User
 	id := c.Params.ByName("id")
-	err := models.FindUser(&user, id)
+	err := models.FindUserById(&user, id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -43,14 +35,14 @@ func GetUser(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	var user models.User
 	id := c.Params.ByName("id")
-	err := models.FindUser(&user, id)
+	err := models.FindUserById(&user, id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
 	}
-	c.BindJSON(&user)
+	c.ShouldBind(&user)
 	err = models.UpdateUser(&user, id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatusJSON(http.StatusConflict, err)
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -58,12 +50,29 @@ func UpdateUser(c *gin.Context) {
 func DeleteUser(c *gin.Context) {
 	var user models.User
 	id := c.Params.ByName("id")
-	message := JSON{message: "Berhasil menghapus user"}
-	error := JSON{message: "Gagal menghapus user"}
 	err := models.DeleteUser(&user, id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, error)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 	} else {
-		c.JSON(http.StatusOK, message)
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Berhasil menghapus user dengan ID : " + id,
+		})
+	}
+}
+func LoginUser(c *gin.Context) {
+	var user models.User
+	c.ShouldBind(&user)
+	email := user.Email
+	password := user.Password
+	err := models.FindUserByEmail(&user, email)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNoContent, err)
+	}
+	if err := models.LoginUser(&user, password); err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "Password tidak cocok",
+		})
+	} else {
+		c.JSON(http.StatusOK, user)
 	}
 }

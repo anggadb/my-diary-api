@@ -14,6 +14,7 @@ func UserRouter() *gin.Engine {
 		v1.POST("user", user.CreateUser)
 		v1.PUT("user/:id", user.UpdateUser)
 		v1.DELETE("user/:id", user.DeleteUser)
+		v1.POST("user/login", user.LoginUser)
 	}
 	return r
 }

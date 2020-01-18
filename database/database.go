@@ -2,10 +2,8 @@ package database
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
+	"os"
 )
 
 var DB *gorm.DB
