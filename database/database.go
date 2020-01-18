@@ -2,43 +2,36 @@ package database
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"os"
-	"strconv"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
 
 type DBConfig struct {
-	Host     string
-	Port     int
 	User     string
 	Name     string
 	Password string
+	Sslmode  string
 }
 
 func BuildDBConfig() *DBConfig {
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
-	}
 	dbConfig := DBConfig{
-		Host:     os.Getenv("DB_HOST"),
-		Port:     port,
 		User:     os.Getenv("DB_USER"),
 		Name:     os.Getenv("DB_NAME"),
 		Password: os.Getenv("DB_PASSWORD"),
+		Sslmode:  os.Getenv("DB_SSLMODE"),
 	}
 	return &dbConfig
 }
 func DBURL(dbConfig *DBConfig) string {
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		"user=%s password=%s dbname=%s sslmode=%s",
 		dbConfig.User,
 		dbConfig.Password,
-		dbConfig.Host,
-		dbConfig.Port,
 		dbConfig.Name,
+		dbConfig.Sslmode,
 	)
 }
