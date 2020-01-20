@@ -7,8 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var db *gorm.DB
-
 type User struct {
 	gorm.Model
 	Name     string `json:"name" form:"name"`
@@ -18,10 +16,7 @@ type User struct {
 	Phone    string `gorm:"unique" json:"phone" form:"phone"`
 	Address  string `gorm:"type:text" json:"address" form:"address"`
 	Active   bool   `gorm:"default:true;not null" json:"active" form:"active"`
-}
-
-type FailLogin struct {
-	message string
+	Diaries  []Diary
 }
 
 func (b *User) TableName() string {

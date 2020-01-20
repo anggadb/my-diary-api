@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	auth "MyDiaryApi/v1/lib"
 	"MyDiaryApi/v1/models"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 )
 
 func CreateUser(c *gin.Context) {
@@ -73,6 +76,25 @@ func LoginUser(c *gin.Context) {
 			"error": "Password tidak cocok",
 		})
 	} else {
-		c.JSON(http.StatusOK, user)
+		claims := auth.Payload{
+			user.ID,
+			user.Email,
+			jwt.StandardClaims{ExpiresAt: 15000},
+		}
+		sign := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+		token, err := sign.SignedString([]byte(os.Getenv("SECRET_KEY")))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusProcessing, gin.H{
+				"messager": "Gagal memproses login",
+			})
+		}
+		callback := auth.TokenResponse{
+			token,
+			auth.Payload{
+				Email: claims.Email,
+				ID:    claims.ID,
+			},
+		}
+		c.JSON(http.StatusOK, callback)
 	}
 }
