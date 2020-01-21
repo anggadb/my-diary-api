@@ -2,13 +2,19 @@ package controllers
 
 import (
 	"MyDiaryApi/v1/models"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CreateDiary(c *gin.Context) {
 	var diary models.Diary
 	c.ShouldBind(&diary)
+	userId := c.MustGet("id").(uint)
+	diary.UserID = userId
+	fmt.Println("User ID : ", userId)
+	fmt.Printf("This is Diary : %d", diary.UserID)
 	err := models.CreateDiary(&diary)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusConflict, err)
@@ -20,9 +26,6 @@ func CreateDiary(c *gin.Context) {
 // func FindDiary(c *gin.Context) {
 // 	var diary models.Diary
 // 	c.ShouldBind(&diary)
-// 	postType := c.PostForm("post_type")
-// 	fmt.Printf("Post type : %s", postType)
-// 	if postType == "user" {
-// 		err := models.FindDiaryByUser()
-// 	}
+// 	postType := c.PostForm("post_type"
+
 // }

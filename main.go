@@ -5,16 +5,17 @@ import (
 	"MyDiaryApi/v1/models"
 	"MyDiaryApi/v1/routes"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
-	"log"
+	"os"
 )
 
 var err error
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Print("Dokumen .env tidak ditemukan")
+		fmt.Println("Dokumen .env tidak ditemukan")
 	}
 }
 func main() {
@@ -24,6 +25,9 @@ func main() {
 	}
 	defer database.DB.Close()
 	database.DB.AutoMigrate(&models.User{})
-	r := routes.UserRouter()
-	r.Run(":8080")
+	database.DB.AutoMigrate(&models.Diary{})
+	router := gin.Default()
+	routes.DiaryRouter(router)
+	routes.UserRouter(router)
+	router.Run(os.Getenv("PORT"))
 }

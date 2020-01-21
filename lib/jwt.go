@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 type Payload struct {
 	ID    uint   `json:"id"`
 	Email string `json:"email"`
+	Type  string `json:"type"`
 	jwt.StandardClaims
 }
 type TokenResponse struct {
@@ -18,22 +18,29 @@ type TokenResponse struct {
 	Payload
 }
 
-func auth(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		if jwt.GetSigningMethod("HS256") != t.Method {
-			return nil, fmt.Errorf("Signing method tidak diterima : %v", t.Header["alg"])
-		}
+func Auth(c *gin.Context) {
+	token := c.Request.Header.Get("authorization")
+	claims := &Payload{}
+	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
-	if parsedToken == nil && err != nil {
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"message": "Gagal memverifikasi algoritma token",
+			})
+		}
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"message": "Tidak mempunyai akses",
+			"message": "Gagal memproses token",
+			"error":   err,
 		})
-	} else {
-		payload := parsedToken.Claims.(jwt.MapClaims)
-		fmt.Printf("ID : %s", payload["ID"])
-		c.Set("id", payload["ID"])
-		c.Next()
 	}
+	if !parsedToken.Valid {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "Token tidak valid",
+		})
+	}
+	c.Set("id", claims.ID)
+	c.Set("type", claims.Type)
+	c.Next()
 }

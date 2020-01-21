@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"time"
 )
 
 func CreateUser(c *gin.Context) {
@@ -76,24 +77,26 @@ func LoginUser(c *gin.Context) {
 			"error": "Password tidak cocok",
 		})
 	} else {
+		expiresIn := time.Now().Add(98 * time.Hour)
 		claims := auth.Payload{
 			user.ID,
 			user.Email,
-			jwt.StandardClaims{ExpiresAt: 15000},
+			"user",
+			jwt.StandardClaims{
+				ExpiresAt: expiresIn.Unix(),
+			},
 		}
-		sign := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-		token, err := sign.SignedString([]byte(os.Getenv("SECRET_KEY")))
+		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+		encodedToken, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusProcessing, gin.H{
-				"messager": "Gagal memproses login",
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "Gagal memproses token",
+				"error":   err,
 			})
 		}
 		callback := auth.TokenResponse{
-			token,
-			auth.Payload{
-				Email: claims.Email,
-				ID:    claims.ID,
-			},
+			encodedToken,
+			claims,
 		}
 		c.JSON(http.StatusOK, callback)
 	}
