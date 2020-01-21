@@ -32,7 +32,7 @@ func CreateDiary(diary *Diary) (err error) {
 	}
 	return nil
 }
-func FindDiaryById(diary *Diary, id string) (err error) {
+func FindDiaryById(diary *Diary, id uint) (err error) {
 	if err := database.DB.Where("id = ?", id).First(diary).Error; err != nil {
 		return err
 	}
@@ -44,15 +44,15 @@ func FindDiaryByUser(diary *Diary, user_id string) (err error) {
 	}
 	return nil
 }
-func FindAllDiaries(diary *[]Diary) (err error) {
-	if err := database.DB.Find(diary).Error; err != nil {
+func FindAllDiaries(diary *[]Diary, id uint) (err error) {
+	if err := database.DB.Where("user_id = ?", id).Find(diary).Error; err != nil {
 		return err
 	}
 	return nil
 }
-func UpdateDiary(diary *Diary) (err error) {
-	if err := database.DB.Save(diary).Error; err != nil {
-		return nil
+func UpdateDiary(diary *Diary, id string) (err error) {
+	if err := database.DB.Where("id = ?", id).Updates(diary).Error; err != nil {
+		return err
 	}
 	return nil
 }

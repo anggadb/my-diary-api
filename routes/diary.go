@@ -10,4 +10,6 @@ import (
 func DiaryRouter(route *gin.Engine) {
 	v := route.Group(os.Getenv("API_VERSION"))
 	v.POST("diary", lib.Auth, diary.CreateDiary)
+	v.GET("diaries", lib.Auth, diary.FindAllDiaries)
+	v.PUT("diary/:id", lib.Auth, diary.UpdateDiary)
 }
