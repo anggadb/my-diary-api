@@ -5,10 +5,11 @@ import (
 	"MyDiaryApi/v1/models"
 	"MyDiaryApi/v1/routes"
 	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
-	"os"
 )
 
 var err error

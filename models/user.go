@@ -2,6 +2,7 @@ package models
 
 import (
 	"MyDiaryApi/v1/database"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -14,7 +15,6 @@ type User struct {
 	Password string `gorm:"not null" json:"password" form:"password"`
 	Username string `gorm:"not null" json:"username" form:"username"`
 	Phone    string `gorm:"unique" json:"phone" form:"phone"`
-	Address  string `gorm:"type:text" json:"address" form:"address"`
 	Active   bool   `gorm:"default:true;not null" json:"active" form:"active"`
 	Diaries  []Diary
 }

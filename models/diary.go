@@ -2,7 +2,6 @@ package models
 
 import (
 	"MyDiaryApi/v1/database"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )

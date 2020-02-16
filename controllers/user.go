@@ -3,11 +3,13 @@ package controllers
 import (
 	auth "MyDiaryApi/v1/lib"
 	"MyDiaryApi/v1/models"
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 func CreateUser(c *gin.Context) {
@@ -19,7 +21,6 @@ func CreateUser(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusCreated, user)
 	}
-
 }
 func GetAllUsers(c *gin.Context) {
 	var u []models.User
@@ -27,6 +28,16 @@ func GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, u)
 }
 func GetUser(c *gin.Context) {
+	var user models.User
+	id := strconv.FormatUint(uint64(c.MustGet("id").(uint)), 10)
+	err := models.FindUserById(&user, id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNoContent, err)
+	} else {
+		c.JSON(http.StatusOK, user)
+	}
+}
+func GetUserById(c *gin.Context) {
 	var user models.User
 	id := c.Params.ByName("id")
 	err := models.FindUserById(&user, id)
