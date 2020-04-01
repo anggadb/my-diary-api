@@ -14,7 +14,15 @@ import (
 
 func CreateUser(c *gin.Context) {
 	var user models.User
+	var conf models.ConfirmationPass
 	c.ShouldBind(&user)
+	c.ShouldBind(&conf)
+	if conf.ConfPass != user.Password {
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+			"message": "Password tidak sesuai",
+		})
+		return
+	}
 	err := models.CreateUser(&user)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusConflict, err)
@@ -29,17 +37,11 @@ func GetAllUsers(c *gin.Context) {
 }
 func GetUser(c *gin.Context) {
 	var user models.User
-	id := strconv.FormatUint(uint64(c.MustGet("id").(uint)), 10)
-	err := models.FindUserById(&user, id)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNoContent, err)
-	} else {
-		c.JSON(http.StatusOK, user)
+	var id string
+	id = c.Params.ByName("id")
+	if c.MustGet("type") != nil {
+		id = strconv.FormatUint(uint64(c.MustGet("id").(uint)), 10)
 	}
-}
-func GetUserById(c *gin.Context) {
-	var user models.User
-	id := c.Params.ByName("id")
 	err := models.FindUserById(&user, id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, err)
@@ -82,11 +84,13 @@ func LoginUser(c *gin.Context) {
 	err := models.FindUserByEmail(&user, email)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNoContent, err)
+		return
 	}
 	if err := models.LoginUser(&user, password); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "Password tidak cocok",
 		})
+		return
 	} else {
 		expiresIn := time.Now().Add(98 * time.Hour)
 		claims := auth.Payload{
@@ -104,6 +108,7 @@ func LoginUser(c *gin.Context) {
 				"message": "Gagal memproses token",
 				"error":   err,
 			})
+			return
 		}
 		callback := auth.TokenResponse{
 			encodedToken,

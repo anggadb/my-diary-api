@@ -19,6 +19,10 @@ type User struct {
 	Diaries  []Diary
 }
 
+type ConfirmationPass struct {
+	ConfPass string `json:"conf_pass" form:"conf_pass"`
+}
+
 func (b *User) TableName() string {
 	return "user"
 }

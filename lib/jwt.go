@@ -1,10 +1,11 @@
 package lib
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 type Payload struct {
@@ -29,16 +30,19 @@ func Auth(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"message": "Gagal memverifikasi algoritma token",
 			})
+			return
 		}
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Gagal memproses token",
 			"error":   err,
 		})
+		return
 	}
 	if !parsedToken.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Token tidak valid",
 		})
+		return
 	}
 	c.Set("id", claims.ID)
 	c.Set("type", claims.Type)

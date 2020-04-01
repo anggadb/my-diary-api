@@ -15,7 +15,7 @@ func UserRouter(route *gin.Engine) {
 	v.GET("user", lib.Auth, user.GetUser)
 	// ADMIN
 	v.GET("users", user.GetAllUsers)
-	v.GET("user/:id", user.GetUserById)
+	v.GET("user/:id", user.GetUser)
 	v.PUT("user/:id", user.UpdateUser)
 	v.DELETE("user/:id", user.DeleteUser)
 }
