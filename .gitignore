@@ -15,3 +15,6 @@
 # vendor/
 
 *.env
+
+# Environment File
+env/env.go

@@ -1,9 +1,10 @@
 package database
 
 import (
+	"MyDiaryApi/v1/env"
 	"fmt"
+
 	"github.com/jinzhu/gorm"
-	"os"
 )
 
 var DB *gorm.DB
@@ -17,10 +18,10 @@ type DBConfig struct {
 
 func BuildDBConfig() *DBConfig {
 	dbConfig := DBConfig{
-		User:     os.Getenv("DB_USER"),
-		Name:     os.Getenv("DB_NAME"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Sslmode:  os.Getenv("DB_SSLMODE"),
+		User:     env.Environment().DBUser,
+		Name:     env.Environment().DBName,
+		Password: env.Environment().DBPassword,
+		Sslmode:  env.Environment().DBSSLMode,
 	}
 	return &dbConfig
 }

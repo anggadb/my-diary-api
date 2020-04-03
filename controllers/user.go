@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"MyDiaryApi/v1/env"
 	auth "MyDiaryApi/v1/lib"
 	"MyDiaryApi/v1/models"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -102,7 +102,7 @@ func LoginUser(c *gin.Context) {
 			},
 		}
 		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-		encodedToken, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
+		encodedToken, err := token.SignedString([]byte(env.Environment().SecretKey))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Gagal memproses token",

@@ -1,8 +1,8 @@
 package lib
 
 import (
+	"MyDiaryApi/v1/env"
 	"net/http"
-	"os"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func Auth(c *gin.Context) {
 	token := c.Request.Header.Get("authorization")
 	claims := &Payload{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("SECRET_KEY")), nil
+		return []byte(env.Environment().SecretKey), nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {

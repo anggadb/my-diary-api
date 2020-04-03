@@ -2,14 +2,14 @@ package routes
 
 import (
 	user "MyDiaryApi/v1/controllers"
+	"MyDiaryApi/v1/env"
 	lib "MyDiaryApi/v1/lib"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func UserRouter(route *gin.Engine) {
-	v := route.Group(os.Getenv("API_VERSION"))
+	v := route.Group(env.Environment().APIVersion)
 	v.POST("user", user.CreateUser)
 	v.POST("user/login", user.LoginUser)
 	v.GET("user", lib.Auth, user.GetUser)
