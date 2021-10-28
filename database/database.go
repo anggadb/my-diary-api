@@ -9,28 +9,14 @@ import (
 
 var DB *gorm.DB
 
-type DBConfig struct {
-	User     string
-	Name     string
-	Password string
-	Sslmode  string
-}
-
-func BuildDBConfig() *DBConfig {
-	dbConfig := DBConfig{
-		User:     env.Environment().DBUser,
-		Name:     env.Environment().DBName,
-		Password: env.Environment().DBPassword,
-		Sslmode:  env.Environment().DBSSLMode,
-	}
-	return &dbConfig
-}
-func DBURL(dbConfig *DBConfig) string {
+func DBConfig() string {
 	return fmt.Sprintf(
-		"user=%s password=%s dbname=%s sslmode=%s",
-		dbConfig.User,
-		dbConfig.Password,
-		dbConfig.Name,
-		dbConfig.Sslmode,
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		env.Environment().DBHost,
+		env.Environment().DBPort,
+		env.Environment().DBUser,
+		env.Environment().DBPassword,
+		env.Environment().DBName,
+		env.Environment().DBSSLMode,
 	)
 }

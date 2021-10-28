@@ -25,7 +25,9 @@ func CreateUser(c *gin.Context) {
 	}
 	err := models.CreateUser(&user)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusConflict, err)
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{
+			"error": err,
+		})
 	} else {
 		c.JSON(http.StatusCreated, user)
 	}

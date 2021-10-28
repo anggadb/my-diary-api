@@ -9,4 +9,7 @@ type ENVConfig struct {
 	SecretKey  string
 	AdminKey   string
 	APIVersion string
+	ENV        string
+	DBPort     string
+	DBHost     string
 }

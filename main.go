@@ -8,13 +8,13 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	gorm "github.com/jinzhu/gorm"
 )
 
 var err error
 
 func main() {
-	database.DB, err = gorm.Open("postgres", database.DBURL(database.BuildDBConfig()))
+	database.DB, err = gorm.Open("postgres", database.DBConfig())
 	if err != nil {
 		fmt.Println("DB Status : ", err)
 	}

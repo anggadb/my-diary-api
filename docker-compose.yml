@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  mydiary-pq:
+    image: postgres:latest
+    container_name: mydiary-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=my_diary
+      - DATABASE_HOST=mydiary-pq
+    ports:
+      - "5432:5432"
+    volumes:
+      - /Users/Shared/mydiary-pq:/var/lib/postgresql/data
+    networks:
+      - mdr
+
+  app:
+    container_name: mydiary
+    build: .
+    ports:
+      - 3000:3000
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app
+    depends_on:
+      - mydiary-pq
+    links:
+      - mydiary-pq
+    networks:
+      - mdr
+
+volumes:
+  api:
+
+networks:
+  mdr:
+    driver: bridge
